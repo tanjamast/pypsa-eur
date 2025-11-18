@@ -118,8 +118,20 @@ def _load_buses(buses, europe_shape, countries, config):
         else pd.Series(True, buses.index)
     )
 
-    v_nom_min = min(config["electricity"]["voltages"])
-    v_nom_max = max(config["electricity"]["voltages"])
+    # v_nom_min = min(config["electricity"]["voltages"])
+    # v_nom_max = max(config["electricity"]["voltages"])
+    if int(min(config["electricity"]["voltages"])) > 150:
+        v_nom_min = 151 # Definition of EHV according to DIN EN 50160: 150<Un<=800 # Minimum voltage value to filter AC lines.
+    elif (int(min(config["electricity"]["voltages"])) > 36) & (int(min(config["electricity"]["voltages"])) <= 150):
+        v_nom_min = 37 # Definition of EHV according to DIN EN 50160: 36<Un<=150
+    else:
+        v_nom_min = int(min(config["electricity"]["voltages"])) # Minimum voltage value to filter AC lines.
+    if (int(max(config["electricity"]["voltages"])) > 150) & (int(max(config["electricity"]["voltages"])) <= 800):
+        v_nom_max = 800 # Definition of EHV according to DIN EN 50160: 150<Un<=800 #  Maximum voltage value to filter AC lines.
+    elif (int(max(config["electricity"]["voltages"])) > 36) & (int(max(config["electricity"]["voltages"])) <= 150):
+        v_nom_max = 150 # Definition of EHV according to DIN EN 50160: 36<Un<=150 #  Maximum voltage value to filter AC lines.
+    else:
+        v_nom_max = int(max(config["electricity"]["voltages"]))
 
     buses_with_v_nom_to_keep_b = (
         (v_nom_min <= buses.v_nom) & (buses.v_nom <= v_nom_max)
@@ -323,6 +335,13 @@ def _set_electrical_parameters_lines_raw(lines, config):
     lines["carrier"] = "AC"
     lines["dc"] = False
 
+    if 36 < int(min(v_noms)) <= 150:
+        lines.loc[lines.v_nom<=150, "type"] = linetypes[110.]
+        ehv_linetypes = {key: value for key, value in linetypes.items() if key != 110.}
+        lines.loc[lines.v_nom>150, "type"] = lines.loc[lines.v_nom>150, "v_nom"].apply(
+            lambda x: _get_linetype_by_voltage(x, ehv_linetypes)
+        )
+    else:
     lines.loc[:, "type"] = lines.v_nom.apply(
         lambda x: _get_linetype_by_voltage(x, linetypes)
     )
