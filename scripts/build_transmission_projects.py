@@ -539,7 +539,7 @@ if __name__ == "__main__":
                 path=path,
                 plan=project,
                 status=transmission_projects["status"],
-                skip=transmission_projects["skip"],
+                # skip=transmission_projects["skip"],
             )
         )
     if not new_lines_df.empty:
