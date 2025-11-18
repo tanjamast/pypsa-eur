@@ -93,7 +93,7 @@ def connect_new_lines(
     connected to it.
     """
     bus_carrier = np.atleast_1d(bus_carrier)
-    buses = n.buses.query("carrier in @bus_carrier").copy()
+    buses = n.buses.query("carrier in @bus_carrier and v_nom > 150 and substation_lv").copy() # only EHV buses and substation and carrier in @bus_carrier
     bus_tree = spatial.KDTree(buses[["x", "y"]])
 
     for port in [0, 1]:
