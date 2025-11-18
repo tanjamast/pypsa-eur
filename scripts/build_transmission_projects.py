@@ -426,7 +426,8 @@ def add_projects(
                 lines, n, new_buses_df, offshore_shapes=offshore_shapes, country_shapes=country_shapes, bus_carrier="AC",distance_upper_bound=np.inf,
             )
             duplicate_lines = find_closest_lines(
-                n.lines, new_lines, distance_upper_bound=0.10, type="new"
+                n.lines, new_lines, distance_upper_bound=0.2, # entspricht ca. 30km #0.10
+                type="new"
             )
             new_lines = new_lines.drop(duplicate_lines.index, errors="ignore")
             new_lines_df = pd.concat([new_lines_df, new_lines])
@@ -443,7 +444,8 @@ def add_projects(
                 bus_carrier=["AC", "DC"],
             )
             duplicate_links = find_closest_lines(
-                n.links, new_links, distance_upper_bound=0.10, type="new"
+                n.links, new_links, distance_upper_bound=0.2, # entspricht ca. 30km #0.10,
+                type="new"
             )
             new_links = new_links.drop(duplicate_links.index, errors="ignore")
             set_underwater_fraction(new_links, offshore_shapes)
@@ -452,7 +454,8 @@ def add_projects(
             n.add("Link", new_links.index, **new_links)
         elif key == "upgraded_lines":
             line_map = find_closest_lines(
-                n.lines, lines, distance_upper_bound=0.30, type="upgraded"
+                n.lines, lines, distance_upper_bound=0.7, # entspricht ca. 500km #0.30
+                type="upgraded",
             )
             upgraded_lines = lines.loc[line_map.index]
             lines_to_adjust = adjust_decommissioning(upgraded_lines, line_map)
