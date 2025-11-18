@@ -156,7 +156,12 @@ def connect_new_lines(
             lines_port = lines_port[lines_port.match_distance]
 
         lines.loc[lines_port.index, f"bus{port}"] = lines_port["neighbor"]
-
+    # drop duplicates in new lines
+    attr = ['bus0','bus1','p_nom'] if "p_nom" in lines else ['bus0','bus1','v_nom']
+    lines = lines.drop_duplicates(subset=attr)
+    # p_min_pu set to value -1 to enable power flow in both directions
+    if "p_nom" in lines.columns:
+        lines['p_min_pu'] = -1
     lines = lines.assign(under_construction=True)
 
     return lines, new_buses_df
