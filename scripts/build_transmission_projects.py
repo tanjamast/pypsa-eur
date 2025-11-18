@@ -81,6 +81,7 @@ def connect_new_lines(
     lines,
     n,
     new_buses_df,
+    country_shapes=None,
     offshore_shapes=None,
     distance_upper_bound=np.inf,
     bus_carrier="AC",
@@ -94,7 +95,7 @@ def connect_new_lines(
     """
     bus_carrier = np.atleast_1d(bus_carrier)
     buses = n.buses.query("carrier in @bus_carrier and v_nom > 150 and substation_lv").copy() # only EHV buses and substation and carrier in @bus_carrier
-    bus_tree = spatial.KDTree(buses[["x", "y"]])
+    # bus_tree = spatial.KDTree(buses[["x", "y"]])
 
     for port in [0, 1]:
         lines_port = lines["geometry"].apply(
@@ -102,10 +103,33 @@ def connect_new_lines(
                 get_bus_coords_from_port(x, port=port), index=["x", "y"]
             )
         )
-        distances, indices = bus_tree.query(lines_port)
+
+        # Determine country from coordinates (spatial join)
+        country = pd.concat([country_shapes,offshore_shapes])
+        lines_port_gdf = gpd.GeoDataFrame(
+            lines_port,
+            geometry=gpd.points_from_xy(lines_port.x, lines_port.y),
+            crs=country.crs  # same projection as country
+        )
+        lines_port_gdf = gpd.sjoin(lines_port_gdf, country[["geometry", "country"]], how="left")
+
+        neighbors = []
+        match_flags = []
+        for c, buses_c in buses.groupby("country"):
+            mask = lines_port_gdf["country"] == c
+            if not mask.any():
+                continue
+                
+            bus_tree = spatial.KDTree(buses_c[["x", "y"]])
+            distances, indices = bus_tree.query(lines_port_gdf.loc[mask, ["x", "y"]])
         # Series of lines with closest bus in the existing network and whether they match the distance criterion
-        lines_port["neighbor"] = buses.iloc[indices].index
-        lines_port["match_distance"] = distances < distance_upper_bound
+            neighbors_series = pd.Series(buses_c.iloc[indices].index, index=lines_port_gdf.index[mask])
+            match_series = pd.Series(distances < distance_upper_bound, index=lines_port_gdf.index[mask])
+            neighbors.append(neighbors_series)
+            match_flags.append(match_series)
+        
+        lines_port["neighbor"] = pd.concat(neighbors).sort_index()
+        lines_port["match_distance"] = pd.concat(match_flags).sort_index()
         # For buses which are not close to any existing bus, only add a new bus if the line is going offshore (e.g. North Sea Wind Power Hub)
         if not lines_port.match_distance.all() and offshore_shapes.union_all():
             potential_new_buses = lines_port[~lines_port.match_distance]
@@ -382,6 +406,7 @@ def add_projects(
     new_buses_df,
     europe_shape,
     offshore_shapes,
+    country_shapes,
     path,
     plan,
     status=["confirmed", "under construction"],
@@ -398,7 +423,7 @@ def add_projects(
             continue
         if key == "new_lines":
             new_lines, new_buses_df = connect_new_lines(
-                lines, n, new_buses_df, bus_carrier="AC"
+                lines, n, new_buses_df, offshore_shapes=offshore_shapes, country_shapes=country_shapes, bus_carrier="AC",distance_upper_bound=np.inf,
             )
             duplicate_lines = find_closest_lines(
                 n.lines, new_lines, distance_upper_bound=0.10, type="new"
@@ -413,7 +438,8 @@ def add_projects(
                 n,
                 new_buses_df,
                 offshore_shapes=offshore_shapes,
-                distance_upper_bound=0.4,
+                country_shapes=country_shapes,
+                distance_upper_bound=np.inf, #distance_upper_bound=0.4,
                 bus_carrier=["AC", "DC"],
             )
             duplicate_links = find_closest_lines(
@@ -483,6 +509,9 @@ if __name__ == "__main__":
     offshore_shapes = gpd.read_file(snakemake.input.offshore_shapes).rename(
         {"name": "country"}, axis=1
     )
+    country_shapes = gpd.read_file(snakemake.input.country_shapes).rename(
+        {"name": "country"}, axis=1
+    )
 
     transmission_projects = snakemake.params.transmission_projects
     projects = [
@@ -503,6 +532,7 @@ if __name__ == "__main__":
                 new_buses_df,
                 europe_shape,
                 offshore_shapes,
+                country_shapes,
                 path=path,
                 plan=project,
                 status=transmission_projects["status"],
