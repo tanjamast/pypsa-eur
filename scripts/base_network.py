@@ -747,8 +747,16 @@ def base_network(
 
     n = _remove_unconnected_components(n)
 
+    trafo_num = list(set(n.transformers.index.str.split(pat='-', expand=True).get_level_values(0)))
+    for trafo in trafo_num:
+        n.buses.loc[n.buses.index.str.contains(trafo),'x'] = n.buses.loc[n.buses.index.str.contains(trafo),'x'].mean()
+        n.buses.loc[n.buses.index.str.contains(trafo),'y'] = n.buses.loc[n.buses.index.str.contains(trafo),'y'].mean()
+    for c in converters.index:
+        n.buses.loc[n.buses.index.isin(list(converters.loc[c,['bus0','bus1']])),'x'] = n.buses.loc[n.buses.index.isin(list(converters.loc[c,['bus0','bus1']])),'x'].mean()
+        n.buses.loc[n.buses.index.isin(list(converters.loc[c,['bus0','bus1']])),'y'] = n.buses.loc[n.buses.index.isin(list(converters.loc[c,['bus0','bus1']])),'y'].mean()
     _set_countries_and_substations(n, config, country_shapes, offshore_shapes)
-
+    trafo_buses = list(set(n.transformers.bus0)|set(n.transformers.bus1))
+    n.buses.loc[((n.buses.index.isin(trafo_buses))&(n.buses.substation_lv==False)&(n.buses.substation_off==False)),['substation_lv','onshore_bus']] = [True, True]
     _set_links_underwater_fraction(n, offshore_shapes)
 
     _replace_b2b_converter_at_country_border_by_link(n)
