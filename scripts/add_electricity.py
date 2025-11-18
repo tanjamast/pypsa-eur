@@ -883,7 +883,9 @@ def estimate_renewable_capacities(
             logger.info(
                 f"Reducing capacity expansion limit to {expansion_limit * 100:.2f}% of installed capacity."
             )
-            n.generators.loc[tech_i, "p_nom_max"] = (
+            n.generators.loc[tech_i, "p_nom_max"] = np.where(
+                n.generators.loc[tech_i, "p_nom_min"] == 0,
+                np.inf,
                 expansion_limit * n.generators.loc[tech_i, "p_nom_min"]
             )
 
