@@ -916,6 +916,8 @@ def process_offshore_regions(
 
         c_b = buses.country == country
         offshore_shape = offshore_shapes[country]
+
+        if not buses.loc[c_b & buses.substation_off].empty:
         offshore_locs = buses.loc[c_b & buses.substation_off, ["x", "y"]].rename_axis(
             "name"
         )
