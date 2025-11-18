@@ -466,7 +466,7 @@ def add_projects(
             line_map = find_closest_lines(
                 n.links.query("carrier=='DC'"),
                 lines,
-                distance_upper_bound=0.30,
+                distance_upper_bound=0.7, # 3.33 entspricht ca. 500km #0.30,
                 type="upgraded",
             )
             upgraded_links = lines.loc[line_map.index]
