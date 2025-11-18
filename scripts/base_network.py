@@ -1598,16 +1598,18 @@ if __name__ == "__main__":
     nuts3_shapes = snakemake.input.nuts3_shapes
     clustering = snakemake.params.get("clustering", "busmap")
     admin_levels = snakemake.params.get("admin_levels")
+    base_network = snakemake.params.base_network
+    europe_shape = snakemake.input.europe_shape
+    country_shapes = snakemake.input.country_shapes
+    offshore_shapes = snakemake.input.offshore_shapes
+    config = snakemake.config
 
+    if base_network != "egon":
     buses = snakemake.input.buses
     converters = snakemake.input.converters
     transformers = snakemake.input.transformers
     lines = snakemake.input.lines
     links = snakemake.input.links
-    europe_shape = snakemake.input.europe_shape
-    country_shapes = snakemake.input.country_shapes
-    offshore_shapes = snakemake.input.offshore_shapes
-    config = snakemake.config
 
     if "links_p_nom" in snakemake.input.keys():
         links_p_nom = snakemake.input.links_p_nom
@@ -1633,6 +1635,10 @@ if __name__ == "__main__":
         parameter_corrections,
         config,
     )
+
+    elif base_network == "egon":
+        from scripts.egon_to_PyPSA import base_from_egon
+        n = base_from_egon()
 
     admin_shapes = build_admin_shapes(
         n,
