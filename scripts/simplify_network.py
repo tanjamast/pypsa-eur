@@ -525,6 +525,7 @@ if __name__ == "__main__":
             busmaps.append(stub_map)
 
     substations_i = n.buses.query("substation_lv or substation_off").index
+    n.buses.loc[list(set(n.buses[buses_with_v_nom_to_keep_b].index.astype(str))&set(n.buses.query("(substation_lv or substation_off)").index)),'substation_off'] = True
 
     # some entries in n.buses are not updated in previous functions, therefore can be wrong. as they are not needed
     # and are lost when clustering (for example with the simpl wildcard), we remove them for consistency:
