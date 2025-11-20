@@ -17,7 +17,7 @@ foresight: overnight #overnight, myopic
 
 scenario:
   clusters:
-  - 303
+  - 314
   opts:
   - 'lv1.0' #_Ept
   sector_opts:
@@ -144,19 +144,19 @@ costs:
 clustering:
   focus_weights:
     #303 nodes: 290 for Germany, 1 per each of other 12 "Stromnachbarn" 
-    'DE': 0.957095 # 290/303
-    'AT': 0.003300 # 1/303
-    'BE': 0.003300
-    'CH': 0.003300
-    'CZ': 0.003300
-    'DK': 0.006600
-    'FR': 0.003300
-    'GB': 0.003300
-    'LU': 0.003300
-    'NL': 0.003300
-    'NO': 0.003300
-    'PL': 0.003300
-    'SE': 0.003300
+    'DE': 0.955414 # 290/303
+    'AT': 0.003184 # 1/303
+    'BE': 0.003184
+    'CH': 0.003184
+    'CZ': 0.003184
+    'DK': 0.006369
+    'FR': 0.003184
+    'GB': 0.006369
+    'LU': 0.003184
+    'NL': 0.003184
+    'NO': 0.003184
+    'PL': 0.003184
+    'SE': 0.003184
   simplify_network:
     to_substations: true #false
     remove_stubs: false #true
