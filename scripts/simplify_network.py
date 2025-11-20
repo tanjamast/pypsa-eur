@@ -47,7 +47,7 @@ import numpy as np
 import pandas as pd
 import pypsa
 import scipy as sp
-from pypsa.clustering.spatial import busmap_by_stubs, get_clustering_from_busmap
+from pypsa.clustering.spatial import busmap_by_stubs, get_clustering_from_busmap, aggregatebuses
 from scipy.sparse.csgraph import connected_components, dijkstra
 
 from scripts._helpers import configure_logging, set_scenario_config
@@ -83,6 +83,7 @@ def simplify_network_to_380(
     trafo_map = trafo_map[~trafo_map.index.duplicated(keep="first")]
     while (several_trafo_b := trafo_map.isin(trafo_map.index)).any():
         trafo_map[several_trafo_b] = trafo_map[several_trafo_b].map(trafo_map)
+    n.buses.loc[list(set(trafo_map)),['substation_lv','substation_off']] = [True, True]                                                                                   
     missing_buses_i = n.buses.index.difference(trafo_map.index)
     missing = pd.Series(missing_buses_i, missing_buses_i)
     trafo_map = pd.concat([trafo_map, missing])
@@ -100,8 +101,21 @@ def simplify_network_to_380(
 
 
 def _remove_clustered_buses_and_branches(n: pypsa.Network, busmap: pd.Series) -> None:
+    buses = aggregatebuses(
+        n,
+        busmap,
+        {
+            "substation_lv": lambda x: bool(x.sum()),
+            "substation_off": lambda x: bool(x.sum()),
+            "onshore_bus": lambda x: bool(x.sum()),
+            "v_nom_origin" : "max", 
+        },
+    )
+
     buses_to_del = n.buses.index.difference(busmap)
-    n.remove("Bus", buses_to_del)
+    # n.remove("Bus", buses_to_del)
+    n.remove("Bus", n.buses.index)
+    n.add("Bus", name=buses.index,  **buses)
     for c in n.branch_components:
         df = n.df(c)
         n.remove(c, df.index[df.bus0.isin(buses_to_del) | df.bus1.isin(buses_to_del)])
@@ -324,6 +338,7 @@ def aggregate_to_substations(
     bus_strategies = aggregation_strategies.get("buses", dict())
     bus_strategies.setdefault("substation_lv", lambda x: bool(x.sum()))
     bus_strategies.setdefault("substation_off", lambda x: bool(x.sum()))
+    bus_strategies.setdefault("onshore_bus", lambda x: bool(x.sum()))
 
     clustering = get_clustering_from_busmap(
         n,
