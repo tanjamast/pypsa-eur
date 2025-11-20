@@ -597,6 +597,9 @@ if __name__ == "__main__":
     for which in ["regions_onshore", "regions_offshore"]:
         regions = gpd.read_file(snakemake.input[which])
         clustered_regions = cluster_regions(busmaps, regions, with_country=True)
+        if clustered_regions.to_crs(3035).area.min()==0:
+            sel = clustered_regions.to_crs(3035).area > 0 # m2
+            clustered_regions = clustered_regions.loc[sel]
         clustered_regions.to_file(snakemake.output[which])
         # append_bus_shapes(n, clustered_regions, type=which.split("_")[1])
 
