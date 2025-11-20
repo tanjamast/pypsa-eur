@@ -348,7 +348,57 @@ def aggregate_to_substations(
     )
     return clustering.n, busmap
 
+def remove_HV_level(
+    n: pypsa.Network,
+    buses_i: pd.Index | list,
+    # line_length_factor: float = 1.25,
+    aggregation_strategies: dict | None = None,
+) -> tuple[pypsa.Network, pd.Series]:
 
+    logger.info("Removing HV_level")
+
+    weight = pd.concat(
+        {
+            "Line": n.lines.length / n.lines.s_nom.clip(1e-3),
+            "Link": n.links.length / n.links.p_nom.clip(1e-3),
+        }
+    )
+
+    adj = n.adjacency_matrix(branch_components=["Line", "Link"], weights=weight).tocsr()
+
+    no_buses_i = n.buses.index.difference(buses_i)
+    bus_indexer = n.buses.index.get_indexer(buses_i)
+    dist = pd.DataFrame(
+        dijkstra(adj, directed=False, indices=bus_indexer), buses_i, n.buses.index
+    )[no_buses_i]
+
+    country_values = n.buses.country.values
+    carrier_values = n.buses.carrier.values
+    country_mask = pd.DataFrame(
+        (country_values[:, np.newaxis] == country_values)
+        & (carrier_values != "DC"),
+        index=n.buses.index,
+        columns=n.buses.index,
+    )[no_buses_i]
+
+    busmap = n.buses.index.to_series()
+    busmap.loc[no_buses_i] = dist.where(country_mask, np.inf).idxmin(0)
+
+    line_strategies_HV = aggregation_strategies.get("lines", dict())
+
+    bus_strategies = aggregation_strategies.get("buses", dict())
+    bus_strategies.setdefault("substation_lv", lambda x: bool(x.sum()))
+    bus_strategies.setdefault("substation_off", lambda x: bool(x.sum()))
+    bus_strategies.setdefault("onshore_bus", lambda x: bool(x.sum()))
+    bus_strategies.setdefault("v_nom_origin", "max")
+
+    clustering = get_clustering_from_busmap(
+        n,
+        busmap,
+        line_strategies=line_strategies_HV,
+        bus_strategies=bus_strategies,
+    )
+    return clustering, busmap #clustering.n
 def find_closest_bus(n, x, y, tol=2000):
     """
     Find the index of the closest bus to the given coordinates within a specified tolerance.
@@ -446,7 +496,14 @@ if __name__ == "__main__":
     n = pypsa.Network(snakemake.input.network)
     Nyears = n.snapshot_weightings.objective.sum() / 8760
     buses_prev, lines_prev, links_prev = len(n.buses), len(n.lines), len(n.links)
-
+    voltages = snakemake.params.voltages
+    HV_treshold = 150 # Definition HV laut DIN EN 50160
+    buses_with_v_nom_to_keep_b = (
+            (n.buses.v_nom > HV_treshold) 
+            | (n.buses.v_nom.isnull())
+            | (n.buses.carrier == "DC")  # Keeping all DC buses from the input dataset independent of voltage (e.g. 150 kV connections)
+    )
+    EHV_buses = list(n.buses[buses_with_v_nom_to_keep_b].index.astype(str)) #all buses from base.nc conected to lines or links and with v_nom > 150
     linetype_380 = snakemake.config["lines"]["types"][380]
     n, trafo_map = simplify_network_to_380(n, linetype_380)
     busmaps = [trafo_map]
@@ -489,6 +546,20 @@ if __name__ == "__main__":
         )
         busmaps.append(substation_map)
 
+    if (min(voltages) <= 150) & params.simplify_network["hv_reduction"]:
+        ehv_buses = list((set(EHV_buses)) & set(n.buses.index))
+        logger.info(
+            f"Aggregating {len(list((set(n.buses.index)-set(ehv_buses))))} HV-buses to {len(ehv_buses)} EHV-buses"
+        )
+        clustering, hv_map = remove_HV_level(n, ehv_buses, params.aggregation_strategies)
+        n = clustering.n
+        getattr(clustering, "linemap").to_csv(snakemake.output.linemap_hv)
+        busmaps.append(hv_map)
+    elif not ((min(voltages) <= 150) & params.simplify_network["hv_reduction"]):
+        hv_map = pd.Series()
+        linemap_hv = pd.Series()
+        linemap_hv.to_csv(snakemake.output.linemap_hv)
+    hv_map.to_csv(snakemake.output.busmap_hv)
     # all buses without shapes need to be clustered to their closest neighbor for HAC
     if params.cluster_network["algorithm"] == "hac":
         buses_i = list(n.buses.index.difference(n.shapes.idx))
