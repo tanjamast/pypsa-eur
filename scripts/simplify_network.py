@@ -346,7 +346,7 @@ def aggregate_to_substations(
         bus_strategies=bus_strategies,
         line_strategies=line_strategies,
     )
-    return clustering.n, busmap
+    return clustering, busmap
 
 def remove_HV_level(
     n: pypsa.Network,
@@ -542,10 +542,21 @@ if __name__ == "__main__":
     n.lines.drop(remove, axis=1, errors="ignore", inplace=True)
 
     if params.simplify_network["to_substations"]:
-        n, substation_map = aggregate_to_substations(
+        # n, substation_map = aggregate_to_substations(
+            # n, substations_i, params.aggregation_strategies
+        # )
+        logger.info(
+            f"Aggregating {len(list((set(n.buses.index)-set(substations_i))))} buses to {len(substations_i)} substations from {len(list((set(n.buses.index))))} buses in total"
+        )
+        clustering, substation_map = aggregate_to_substations(
             n, substations_i, params.aggregation_strategies
         )
+        n = clustering.n
+        getattr(clustering, "linemap").to_csv(snakemake.output.linemap_s)
         busmaps.append(substation_map)
+    else:
+        linemap_s = pd.Series()
+        linemap_s.to_csv(snakemake.output.linemap_s)
 
     if (min(voltages) <= 150) & params.simplify_network["hv_reduction"]:
         ehv_buses = list((set(EHV_buses)) & set(n.buses.index))
@@ -568,11 +579,18 @@ if __name__ == "__main__":
             "Preparing for HAC-Clustering. "
             f"Aggregating {len(buses_i)} buses without Voronoi shapes to closest neighbor."
         )
-        n, busmap_hac = aggregate_to_substations(
-            n, buses_i, params.aggregation_strategies
+        # n, busmap_hac = aggregate_to_substations(
+            # n, buses_i, params.aggregation_strategies
+        # )
+        clustering, busmap_hac = aggregate_to_substations(
+            n, buses_i, params.aggregation_strategies #params.length_factor,
         )
+        n = clustering.n
+        getattr(clustering, "linemap").to_csv(snakemake.output.linemap_hac)
         busmaps.append(busmap_hac)
-
+    elif not params.cluster_network["algorithm"] == "hac":
+        linemap_hac = pd.Series()
+        linemap_hac.to_csv(snakemake.output.linemap_hac)
     busmap_s = reduce(lambda x, y: x.map(y), busmaps[1:], busmaps[0])
     busmap_s.to_csv(snakemake.output.busmap)
 
