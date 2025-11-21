@@ -354,7 +354,7 @@ def remove_HV_level(
     # line_length_factor: float = 1.25,
     aggregation_strategies: dict | None = None,
 ) -> tuple[pypsa.Network, pd.Series]:
-
+    
     logger.info("Removing HV_level")
 
     weight = pd.concat(
@@ -557,7 +557,7 @@ if __name__ == "__main__":
     else:
         linemap_s = pd.Series()
         linemap_s.to_csv(snakemake.output.linemap_s)
-
+       
     if (min(voltages) <= 150) & params.simplify_network["hv_reduction"]:
         ehv_buses = list((set(EHV_buses)) & set(n.buses.index))
         logger.info(
