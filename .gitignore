@@ -84,3 +84,5 @@ CLAUDE.md
 .claude/
 .github/copilot-instructions.md
 CLAUDE.local.md
+*.lp
+*.sol
