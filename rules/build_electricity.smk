@@ -616,6 +616,7 @@ rule simplify_network:
         ),
         p_max_pu=config_provider("links", "p_max_pu", default=1.0),
         p_min_pu=config_provider("links", "p_min_pu", default=-1.0),
+        voltages=config_provider("electricity", "voltages"),
     input:
         network=resources("networks/base_extended.nc"),
         regions_onshore=resources("regions_onshore.geojson"),
