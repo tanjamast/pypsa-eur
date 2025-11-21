@@ -627,6 +627,10 @@ rule simplify_network:
         regions_onshore=resources("regions_onshore_base_s.geojson"),
         regions_offshore=resources("regions_offshore_base_s.geojson"),
         busmap=resources("busmap_base_s.csv"),
+        busmap_hv=resources("busmap_base_s_hv.csv"),
+        linemap_s=resources("linemap_to_substation.csv"),
+        linemap_hv=resources("linemap_HVreduction.csv"),
+        linemap_hac=resources("linemap_hac.csv"),
     log:
         logs("simplify_network.log"),
     benchmark:
