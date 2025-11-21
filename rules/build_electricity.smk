@@ -460,6 +460,7 @@ rule build_transmission_projects:
     input:
         base_network=resources("networks/base.nc"),
         offshore_shapes=resources("offshore_shapes.geojson"),
+        country_shapes=resources("country_shapes.geojson"),
         europe_shape=resources("europe_shape.geojson"),
         transmission_projects=lambda w: [
             "data/transmission_projects/" + name
