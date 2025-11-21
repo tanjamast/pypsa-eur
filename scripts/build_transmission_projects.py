@@ -122,7 +122,7 @@ def connect_new_lines(
                 
             bus_tree = spatial.KDTree(buses_c[["x", "y"]])
             distances, indices = bus_tree.query(lines_port_gdf.loc[mask, ["x", "y"]])
-        # Series of lines with closest bus in the existing network and whether they match the distance criterion
+            # Series of lines with closest bus in the existing network and whether they match the distance criterion
             neighbors_series = pd.Series(buses_c.iloc[indices].index, index=lines_port_gdf.index[mask])
             match_series = pd.Series(distances < distance_upper_bound, index=lines_port_gdf.index[mask])
             neighbors.append(neighbors_series)
