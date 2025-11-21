@@ -765,7 +765,7 @@ def base_network(
         _apply_parameter_corrections(n, parameter_corrections)
 
     n = _remove_unconnected_components(n)
-
+    
     trafo_num = list(set(n.transformers.index.str.split(pat='-', expand=True).get_level_values(0)))
     for trafo in trafo_num:
         n.buses.loc[n.buses.index.str.contains(trafo),'x'] = n.buses.loc[n.buses.index.str.contains(trafo),'x'].mean()
@@ -918,22 +918,22 @@ def process_offshore_regions(
         offshore_shape = offshore_shapes[country]
 
         if not buses.loc[c_b & buses.substation_off].empty:
-        offshore_locs = buses.loc[c_b & buses.substation_off, ["x", "y"]].rename_axis(
-            "name"
-        )
-        offshore_regions_c = gpd.GeoDataFrame(
-            {
-                "name": offshore_locs.index,
-                "x": offshore_locs["x"],
-                "y": offshore_locs["y"],
-                "geometry": voronoi(offshore_locs, offshore_shape),
-                "country": country,
-            },
-            crs=crs,
-        )
-        sel = offshore_regions_c.to_crs(3035).area > 10  # m2
-        offshore_regions_c = offshore_regions_c.loc[sel]
-        offshore_regions.append(offshore_regions_c)
+            offshore_locs = buses.loc[c_b & buses.substation_off, ["x", "y"]].rename_axis(
+                "name"
+            )
+            offshore_regions_c = gpd.GeoDataFrame(
+                {
+                    "name": offshore_locs.index,
+                    "x": offshore_locs["x"],
+                    "y": offshore_locs["y"],
+                    "geometry": voronoi(offshore_locs, offshore_shape),
+                    "country": country,
+                },
+                crs=crs,
+            )
+            sel = offshore_regions_c.to_crs(3035).area > 10  # m2
+            offshore_regions_c = offshore_regions_c.loc[sel]
+            offshore_regions.append(offshore_regions_c)
 
     return offshore_regions
 
@@ -1626,36 +1626,36 @@ if __name__ == "__main__":
     config = snakemake.config
 
     if base_network != "egon":
-    buses = snakemake.input.buses
-    converters = snakemake.input.converters
-    transformers = snakemake.input.transformers
-    lines = snakemake.input.lines
-    links = snakemake.input.links
+        buses = snakemake.input.buses
+        converters = snakemake.input.converters
+        transformers = snakemake.input.transformers
+        lines = snakemake.input.lines
+        links = snakemake.input.links
 
-    if "links_p_nom" in snakemake.input.keys():
-        links_p_nom = snakemake.input.links_p_nom
-    else:
-        links_p_nom = None
+        if "links_p_nom" in snakemake.input.keys():
+            links_p_nom = snakemake.input.links_p_nom
+        else:
+            links_p_nom = None
 
-    if "parameter_corrections" in snakemake.input.keys():
-        parameter_corrections = snakemake.input.parameter_corrections
-    else:
-        parameter_corrections = None
+        if "parameter_corrections" in snakemake.input.keys():
+            parameter_corrections = snakemake.input.parameter_corrections
+        else:
+            parameter_corrections = None
 
-    n = base_network(
-        buses,
-        converters,
-        transformers,
-        lines,
-        links,
-        links_p_nom,
-        europe_shape,
-        country_shapes,
-        offshore_shapes,
-        countries,
-        parameter_corrections,
-        config,
-    )
+        n = base_network(
+            buses,
+            converters,
+            transformers,
+            lines,
+            links,
+            links_p_nom,
+            europe_shape,
+            country_shapes,
+            offshore_shapes,
+            countries,
+            parameter_corrections,
+            config,
+        )
 
     elif base_network == "egon":
         from scripts.egon_to_PyPSA import base_from_egon
