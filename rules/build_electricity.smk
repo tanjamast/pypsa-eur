@@ -70,6 +70,10 @@ def input_base_network(w):
         inputs = {c: f"data/{base_network}/{c}.csv" for c in components}
         inputs["parameter_corrections"] = "data/parameter_corrections.yaml"
         inputs["links_p_nom"] = "data/links_p_nom.csv"
+    elif base_network == "egon":
+        inputs = {
+            c: f"data/{base_network}/{osm_prebuilt_version}/{c}.csv" for c in components
+        }
     return inputs
 
 
@@ -83,6 +87,7 @@ rule base_network:
         transformers=config_provider("transformers"),
         clustering=config_provider("clustering", "mode"),
         admin_levels=config_provider("clustering", "administrative"),
+        base_network = config_provider("electricity", "base_network")
     input:
         unpack(input_base_network),
         nuts3_shapes=resources("nuts3_shapes.geojson"),
