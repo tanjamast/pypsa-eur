@@ -46,7 +46,7 @@ electricity:
 
   extendable_carriers:
     Generator: [solar, onwind, offwind-ac, offwind-dc, CCGT]
-    StorageUnit: [battery]
+    StorageUnit: [battery, H2]
     Store: []
     Link: []
 
