@@ -1,10 +1,10 @@
 ,,2030,2030,2040,2040,2050,2050
 ,,min,max,min,max,min,max
 country,carrier,,,,,,
-DE,onwind,0.1,,0.1,,0.1,
-DE,offwind-ac,0.1,,0.1,,0.1,
+DE,onwind,113531,113531,0.1,,0.1,
+DE,offwind-all,36320,36320,0.1,,0.1,
 DE,offwind-dc,0.1,,0.1,,0.1,
-DE,solar,0.2,,0.2,,0.2,
+DE,solar-all,220230,220230,0.2,,0.2,
 LU,onwind,,,,,,
 LU,solar,,,,,,
 NL,onwind,,,,,,
