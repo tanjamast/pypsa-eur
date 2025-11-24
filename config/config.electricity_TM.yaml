@@ -19,7 +19,7 @@ scenario:
   clusters:
   - 314
   opts:
-  - 'lv1.0' #_Ept
+  - 'lv1.0-CCL' #-Ept
   sector_opts:
   - ''
   planning_horizons:
