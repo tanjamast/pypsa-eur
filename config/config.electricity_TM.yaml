@@ -170,6 +170,13 @@ solving:
   options:
     load_shedding: false #true
     noisy_costs: false #true
+  agg_p_nom_limits:
+    agg_offwind: true #false
+    agg_solar: true #false
+    include_existing: true #false
+    file: data/agg_p_nom_minmax.csv
+   constraints:
+    CCL: true #false
   solver:
     name: gurobi
     options: "gurobi-numeric-focus" #gurobi-default #gurobi-runtime
