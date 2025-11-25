@@ -175,7 +175,7 @@ solving:
     agg_solar: true #false
     include_existing: true #false
     file: data/agg_p_nom_minmax.csv
-   constraints:
+  constraints:
     CCL: true #false
   solver:
     name: gurobi
