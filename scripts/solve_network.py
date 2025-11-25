@@ -1420,6 +1420,8 @@ if __name__ == "__main__":
 
     n = pypsa.Network(snakemake.input.network)
     planning_horizons = snakemake.wildcards.get("planning_horizons", None)
+    
+    logger.info(f"planning_horizons:\n{planning_horizons}")
 
     prepare_network(
         n,
