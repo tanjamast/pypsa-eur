@@ -342,9 +342,9 @@ def _set_electrical_parameters_lines_raw(lines, config):
             lambda x: _get_linetype_by_voltage(x, ehv_linetypes)
         )
     else:
-    lines.loc[:, "type"] = lines.v_nom.apply(
-        lambda x: _get_linetype_by_voltage(x, linetypes)
-    )
+        lines.loc[:, "type"] = lines.v_nom.apply(
+            lambda x: _get_linetype_by_voltage(x, linetypes)
+        )
 
     lines["s_max_pu"] = config["lines"]["s_max_pu"]
 
