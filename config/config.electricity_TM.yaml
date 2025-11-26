@@ -176,7 +176,7 @@ solving:
     include_existing: true #false
     file: data/agg_p_nom_minmax.csv
   constraints:
-    CCL: false #false
+    CCL: true #false
   solver:
     name: gurobi
     options: "gurobi-numeric-focus" #gurobi-default #gurobi-runtime
