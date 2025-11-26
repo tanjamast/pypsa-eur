@@ -157,6 +157,9 @@ clustering:
     'NO': 0.027777
     'PL': 0.027777
     'SE': 0.027777
+  build_bidding_zones:
+    remove_islands: true
+    aggregate_to_tyndp: true
   simplify_network:
     to_substations: true #false
     remove_stubs: false #true
