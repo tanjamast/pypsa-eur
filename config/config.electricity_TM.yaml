@@ -61,7 +61,7 @@ electricity:
     enable: true
     from_gem: false #true
     year: 2023 # neueste Daten von 2023, Stand 30.09.2025
-    expansion_limit: false # 2.563 NEP 2023 #false
+    expansion_limit: 2 # 2.563 NEP 2023 #false
     technology_mapping:
       Offshore: offwind-ac
       Onshore: onwind
