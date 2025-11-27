@@ -193,7 +193,7 @@ solving:
       Presolve: -1
       PreSparsify: 1
     gurobi-numeric-focus:
-      threads: 20 #8
+      threads: 15 #8
 
 
   check_objective:
