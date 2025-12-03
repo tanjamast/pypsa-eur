@@ -62,7 +62,7 @@ rule prepare_sector_networks:
 rule solve_elec_networks:
     input:
         expand(
-            RESULTS + "networks/base_s_{clusters}_elec_{opts}.nc",
+            RESULTS + "networks/base_s_{clusters}_elec_{opts}_{planning_horizons}.nc",
             **config["scenario"],
             run=config["run"]["name"],
         ),

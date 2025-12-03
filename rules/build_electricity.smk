@@ -808,6 +808,7 @@ rule prepare_network:
         gaslimit_enable=config_provider("electricity", "gaslimit_enable", default=False),
         gaslimit=config_provider("electricity", "gaslimit"),
         emission_prices=config_provider("costs", "emission_prices"),
+        planning_horizons=config_provider("scenario", "planning_horizons"),
         adjustments=config_provider("adjustments", "electricity"),
         autarky=config_provider("electricity", "autarky", default={}),
         drop_leap_day=config_provider("enable", "drop_leap_day"),
@@ -819,11 +820,11 @@ rule prepare_network:
         ),
         co2_price=lambda w: resources("co2_price.csv") if "Ept" in w.opts else [],
     output:
-        resources("networks/base_s_{clusters}_elec_{opts}.nc"),
+        resources("networks/base_s_{clusters}_elec_{opts}_{planning_horizons}.nc"),
     log:
-        logs("prepare_network_base_s_{clusters}_elec_{opts}.log"),
+        logs("prepare_network_base_s_{clusters}_elec_{opts}_{planning_horizons}.log"),
     benchmark:
-        benchmarks("prepare_network_base_s_{clusters}_elec_{opts}")
+        benchmarks("prepare_network_base_s_{clusters}_elec_{opts}_{planning_horizons}")
     threads: 1
     resources:
         mem_mb=4000,
