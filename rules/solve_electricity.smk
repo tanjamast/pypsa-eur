@@ -44,7 +44,7 @@ else:
             ),
             custom_extra_functionality=input_custom_extra_functionality,
         input:
-            network=resources("networks/base_s_{clusters}_elec_{opts}_{planning_horizons}.nc"),
+            network=resources("networks/base_s_{clusters}_elec_{opts}.nc"),
         output:
             network=RESULTS + "networks/base_s_{clusters}_elec_{opts}_{planning_horizons}.nc",
             config=RESULTS + "configs/config.base_s_{clusters}_elec_{opts}_{planning_horizons}.yaml",
