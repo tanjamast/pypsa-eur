@@ -45,7 +45,7 @@ electricity:
   co2limit: 100.e+6
 
   extendable_carriers:
-    Generator: [solar, onwind, offwind-ac, offwind-dc, CCGT, biomass]
+    Generator: [solar, onwind, offwind-ac, offwind-dc, CCGT, biomass, lignite]
     StorageUnit: [battery, H2]
     Store: []
     Link: []
