@@ -50,6 +50,7 @@ def base_from_egon():
         b1.buses.loc[['30049', '30047'],'v_nom'] = 110.0
         b1.lines.loc['6391','v_nom'] = 110.0
         b1.lines.loc[(b1.lines.bus0=='13702'),'bus1'] = '29169' # OWP Riffgat 110kV -> UW Emden/Borssum 110kV
+        b1.buses.loc[['13798', '29729'],['y','x','country']] = [48.51549841710694, 13.706436915453663, 'AT'] # Koordinaten Kraftwerk Jochstein nach Österreich versetzt
         # ergänzt Trafo Siems 380/220kV
         new_trafo = pd.DataFrame(columns=b1.transformers.replace('',np.nan).dropna(how='all',axis=1).columns)
         new_trafo.loc[str(b0.transformers.index.astype('int').max()+1),['bus0', 'bus1','s_nom', 'x']] = ['32987', '30020', 2000.0, 0.000068]
