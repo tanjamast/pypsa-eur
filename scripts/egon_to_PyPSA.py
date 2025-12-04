@@ -30,15 +30,15 @@ import xarray as xr
 #matplotlib.use('Qt5Agg')
 matplotlib.use('TkAgg')
 
-def base_from_egon():
+def base_from_egon(countries,country_shape,offshore_shape):
     scenario = 'status2019_PoWerD_v3'
     folder_name='D:/Ablage/mast/PythonSkripts/eGo_data/eTraGo_09/'+scenario
 
-    pypsa_version = 'pypsa-eur_v2025.07' #pypsa-eur3
-    resources = ["TM-elec4"] #["TM-EHV","TM-EHV+HV"]
-    countries = ['AT', 'BE', 'CH', 'CZ', 'DE', 'DK', 'FR', 'GB', 'LU', 'NL', 'NO', 'PL', 'SE'] #['AT', 'CH', 'CZ', 'DE', 'DK', 'FR', 'LU', 'NL', 'PL', 'SE']
-    country_shape="C:/" + pypsa_version + "/resources/"+resources[0]+"/country_shapes.geojson"
-    offshore_shape="C:/" + pypsa_version + "/resources/"+resources[0]+"/offshore_shapes.geojson"
+    # pypsa_version = 'pypsa-eur_v2025.07' #pypsa-eur3
+    # resources = ["TM-elec4"] #["TM-EHV","TM-EHV+HV"]
+    # countries = ['AT', 'BE', 'CH', 'CZ', 'DE', 'DK', 'FR', 'GB', 'LU', 'NL', 'NO', 'PL', 'SE'] #['AT', 'CH', 'CZ', 'DE', 'DK', 'FR', 'LU', 'NL', 'PL', 'SE']
+    # country_shape="C:/" + pypsa_version + "/resources/"+resources[0]+"/country_shapes.geojson"
+    # offshore_shape="C:/" + pypsa_version + "/resources/"+resources[0]+"/offshore_shapes.geojson"
     dynamic_line_rating = False
 
     #base
