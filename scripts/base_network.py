@@ -1659,7 +1659,7 @@ if __name__ == "__main__":
 
     elif base_network == "egon":
         from scripts.egon_to_PyPSA import base_from_egon
-        n = base_from_egon()
+        n = base_from_egon(countries,country_shapes,offshore_shapes)
 
     admin_shapes = build_admin_shapes(
         n,
