@@ -34,7 +34,7 @@ def custom_extra_functionality(n, snapshots, snakemake):
         limit = flh.at[carrier,'flh'] * p_nom   # MWh
 
         # Summe über alle Zeitpunkte
-        expr = sum(p[g, t] * dt[t] for t in snapshots)
+        expr = sum(p.loc[t, g] * dt[t] for t in snapshots)
 
         # Constraint hinzufügen
         m.add_constraints(
