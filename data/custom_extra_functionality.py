@@ -18,6 +18,9 @@ def custom_extra_functionality(n, snapshots, snakemake):
     p = m.variables["Generator-p"]
     dt = n.snapshot_weightings["generators"]
     
+    #print(p.indexes)     # Snapshots, Generatoren
+    #print(p.data.dims)
+    
     # Filter: nur Generatoren deren Carrier in flh_carrier stehen
     gens = n.generators.index[
         n.generators.carrier.isin(flh_carrier)
