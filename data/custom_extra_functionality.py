@@ -9,7 +9,7 @@ def custom_extra_functionality(n, snapshots, snakemake):
     """
     import pandas as pd
     
-    gen_p_nom = pd.read_csv('D:/Ablage/mast/PythonSkripts/EntsoeTransparancyData/flh_generation_DE_2024.csv',index_col=0,sep=';')
+    gen_p_nom = pd.read_csv('D:/Ablage/mast/PythonSkripts/EntsoeTransparancyData/flh_generation_DE_2024.csv',index_col=0,sep=';',parse_dates=False,dtype={"real_market_flh": float})
     flh = gen_p_nom.rename(columns={'real_market_flh':'flh'})
     flh_carrier = ['biomass','lignite','coal']
     
@@ -21,7 +21,7 @@ def custom_extra_functionality(n, snapshots, snakemake):
     # Filter: nur Generatoren deren Carrier in flh_carrier stehen
     gens = n.generators.index[
         n.generators.carrier.isin(flh_carrier)
-    ]
+    ].astype('str')
     # Für jeden Carrier ein globales Limit setzen
     for g in gens:
         carrier = n.generators.at[g, "carrier"]
