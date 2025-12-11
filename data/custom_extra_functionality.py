@@ -28,7 +28,7 @@ def custom_extra_functionality(n, snapshots, snakemake):
     # Für jeden Carrier ein globales Limit setzen
     for g in gens:
         carrier = n.generators.at[g, "carrier"]
-        p_nom = n.generators.at[g, "p_nom"]
+        p_nom = m.variables["Generator-p_nom"][g] #n.generators.at[g, "p_nom"]
 
         # Limit für genau diesen Generator
         limit = flh.at[carrier,'flh'] * p_nom   # MWh
