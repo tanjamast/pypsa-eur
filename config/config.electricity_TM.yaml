@@ -76,18 +76,18 @@ atlite:
 renewable:
   offwind-ac:
     max_depth: false
-    correction_factor: 1 #0.2873 #0.6127
+    correction_factor: 1 #0.5540 #0.2873 #0.6127
   offwind-dc:
     max_depth: false
-    correction_factor: 1 #0.2873 #0.6127
+    correction_factor: 1 #0.5540 #0.2873 #0.6127
   offwind-float:
     max_depth: false
     min_depth: false
-    correction_factor: 1 #0.2873 #0.6127
+    correction_factor: 1 #0.5540 #0.2873 #0.6127
   onwind:
-    correction_factor: 1 #0.4690 #0.9069
+    correction_factor: 1 #1.0099 #0.4690 #0.9069
   solar:
-    correction_factor: 1 #0.4087 #0.8112
+    correction_factor: 1 #0.8237 #0.4087 #0.8112
 
 conventional:
   dynamic_fuel_price: false #true
