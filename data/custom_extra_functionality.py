@@ -14,7 +14,7 @@ def custom_extra_functionality(n, snapshots, snakemake):
     flh_carrier = ['biomass','lignite','coal']
     
     m = n.model
-
+    # print(m.variables)   #Namen der variables
     p = m.variables["Generator-p"]
     dt = n.snapshot_weightings["generators"]
     
