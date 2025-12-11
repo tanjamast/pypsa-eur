@@ -8,6 +8,9 @@ from os.path import normpath, exists, join
 from shutil import copyfile, move, rmtree
 from snakemake.utils import min_version
 
+import os
+os.environ["PROJ_LIB"] = r"C:\ProgramData\Anaconda3\envs\pypsa-eur\Library\share\proj"
+
 min_version("8.11")
 
 from scripts._helpers import (
